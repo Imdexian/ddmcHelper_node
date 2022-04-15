@@ -1,25 +1,33 @@
 const {getReserveTime, getCartList, addNewOrder, checkOrder, allCheck, sendBark} = require('./api');
 const schedule = require('node-schedule');
-// const date = new Date('2022-04-15 05:59:55');
-// console.log('执行时间：',date);
-// schedule.scheduleJob(date,()=> {
-//     console.log('定时任务开始执行');
-//
-// })
-
-stock().catch(e => {
-    console.log(e)
-})
-
 let productList = [], orderSign = '', availableTime = [], gap = 10, count = 1;
 
+
+scheduleJob('45 29 08 * * *');
+
+scheduleJob('45 59 05 * * *');
+
+
+// 定时打开 疯狗模式 0.5秒一次
+function scheduleJob(cronTime) {
+    schedule.scheduleJob(cronTime,()=> {
+        console.log(` ${cronTime} start`);
+        gap = 0.5;
+        // 5分钟后关闭疯狗模式
+        setInterval(()=>{
+            gap = 10;
+        },5 * 60*1000);
+    })
+}
+
+stock().catch(e => { console.log(e) })
 async function stock() {
     // 全选
     await allCheck()
     // 获取购物车列表
     const {new_order_product_list, parent_order_info: {parent_order_sign}} = await getCartList();
     if (new_order_product_list.length === 0) {
-        console.log('购物车为空或无可用商品，10秒后重新获取');
+        console.log(`购物车为空或无可用商品，${gap}秒后重新获取`);
         setTimeout(() => {
             stock()
         }, gap * 1000)
