@@ -123,10 +123,14 @@ exports.allCheck = async () => {
 }
 // 发送Bark消息
 exports.sendBark = async (title = '叮咚买菜', msg) => {
-    return await axios.post('https://api.day.app/push', {
-        device_key: barkKey,
-        title,
-        body: msg,
-        url: 'dingdongneighborhood://'
-    });
+    if (barkKey) {
+        return await axios.post('https://api.day.app/push', {
+            device_key: barkKey,
+            title,
+            body: msg,
+            url: 'dingdongneighborhood://'
+        });
+    }
+    return true;
+
 };
